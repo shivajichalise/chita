@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# spinner
+spinnerArray=( '|' '/' '-' '\' )
+
+spin(){
+  clear
+  message=$1
+  while true
+  do
+    for i in "${spinnerArray[@]}"
+    do
+      printf "\033c"
+      printf "%s" "$message $i"
+      sleep 0.2
+    done
+  done
+  clear
+}
+
+mkdir -p "$HOME"/.cache/chita
+cacheDir="$HOME"/.cache/chita
+
+totalArgs=$#
+if [ $totalArgs -eq 0 ]; then
+   echo "Error:run command properly : ./chita <spreadsheet> <sheet_name> <program> <semester>"
+   echo -e "example: ./chita Exam_PU.xlsx BE_IT_CE "Bachelor of Software Engineering" V "
+   exit
+fi
+
+xlsx="$1"
+sheet="$2"
+program="$3"
+semester="$4"
+
+for_I=("II" "III" "IV" "V" "VI" "VII" "VIII")
+for_II=("III" "VII" "VIII")
+for_III=("VIII")
+for_IV=("VIII")
+for_V=("VIII" "VII" "VI" "IV")
+for_VI=("VIII" "VII")
+for_VII=("VIII")
+for_VIII=("I" "II")
+
+extractRoutine(){
+  spin "Extracting.." &
+  pid=$!
+
+  in2csv -I --sheet "$sheet" "$xlsx" > "$cacheDir"/routine.csv 2> /dev/null
+
+  csvfile="$cacheDir/routine.csv"
+
+  awk -v FPAT='[^,]*|"[^"]*"' '{for (i=1;i<=NF;i++) print i, $i}' "$csvfile" > "$cacheDir"/formatted
+
+  formatted="$cacheDir"/formatted
+
+  programNumber=$(awk "/$program/{print}" "$formatted" | cut -d" " -f1)
+
+  awk "/^$programNumber/{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | sed "/^$programNumber $/d" | cut -c 3- > "$cacheDir"/subjects
+
+  semesterNumber=$((++programNumber))
+
+  awk "/^$semesterNumber/{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | sed "/^$semesterNumber $/d" | cut -c 3- > "$cacheDir"/semesters
+
+  awk "/^1 /{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | sed "/^1 $/d" | cut -c 3- > "$cacheDir"/dates
+
+  paste --delimiter=' ' "$cacheDir"/dates "$cacheDir"/subjects "$cacheDir"/semesters > "$cacheDir"/sorted
+
+  sorted="$cacheDir"/sorted
+
+  case $semester in
+
+  "I")
+  for i in "${for_I[@]}"
+  do
+    sed -i "/$i/d" "$sorted"
+  done ;;
+
+  "II")
+  for i in "${for_II[@]}"
+  do
+    sed -i "/$i/d" "$sorted"
+  done ;;
+
+  "III")
+  for i in "${for_III[@]}"
+  do
+    sed -i "/$i/d" "$sorted"
+  done ;;
+
+  "IV")
+  for i in "${for_IV[@]}"
+  do
+    sed -i "/$i/d" "$sorted"
+  done ;;
+
+  "V")
+  for i in "${for_V[@]}"
+  do
+    sed -i "/$i/d" "$sorted"
+  done ;;
+
+  "VI")
+  for i in "${for_VI[@]}"
+  do
+    sed -i "/$i/d" "$sorted"
+  done ;;
+
+  "VII")
+  for i in "${for_VII[@]}"
+  do
+    sed -i "/$i/d" "$sorted"
+  done ;;
+
+  "VIII")
+  for i in "${for_VIII[@]}"
+  do
+    sed -i "/$i/d" "$sorted"
+  done ;;
+
+  *)
+  echo "Special Character."
+  esac
+  
+  kill $pid
+  printf "\033c"
+}
+
+extractRoutine
+
+grep  "$semester" "$cacheDir"/sorted > routine
+cat routine
+# rm -rf "$cacheDir"
