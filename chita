@@ -33,14 +33,14 @@ sheet="$2"
 program="$3"
 semester="$4"
 
-for_I=("II" "III" "IV" "V" "VI" "VII" "VIII")
-for_II=("III" "VII" "VIII")
+for_I=("VIII" "VII" "VI" "V" "IV" "III" "II")
+for_II=("VIII" "VII" "III")
 for_III=("VIII")
 for_IV=("VIII")
 for_V=("VIII" "VII" "VI" "IV")
 for_VI=("VIII" "VII")
 for_VII=("VIII")
-for_VIII=("I" "II")
+for_VIII=("VII" "VI" "V" "IV" "III" "II")
 
 extractRoutine(){
   spin "Extracting.." &
