@@ -33,7 +33,7 @@ mkdir -p "$HOME"/.cache/chita
 cacheDir="$HOME"/.cache/chita
 
 totalArgs=$#
-if [ $totalArgs -eq 0 ]; then
+if [ $totalArgs -ne 4 ]; then
    echo "Error:run command properly : ./chita <spreadsheet> <sheet_name> <program> <semester>"
    echo -e "example: ./chita Exam_PU.xlsx BE_IT_CE "Bachelor of Software Engineering" V "
    exit
