@@ -67,15 +67,22 @@ extractRoutine(){
 
   programNumber=$(awk "/$program/{print}" "$formatted" | cut -d" " -f1)
 
-  awk "/^$programNumber/{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | sed "/^$programNumber $/d" | cut -c 3- > "$cacheDir"/subjects
+  awk "/^$programNumber/{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | cut -c 3- > "$cacheDir"/subjects
+  tac "$cacheDir/subjects" | sed '/\S/,$!d' | tac > "$cacheDir"/subjectsready
+  sed '/\S/,$!d' "$cacheDir"/subjectsready > "$cacheDir"/subjectsfinal
+  # awk "/^$programNumber/{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | sed "/^$programNumber $/d" | cut -c 3- > "$cacheDir"/subjects
 
   semesterNumber=$((++programNumber))
 
-  awk "/^$semesterNumber/{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | sed "/^$semesterNumber $/d" | cut -c 3- > "$cacheDir"/semesters
+  awk "/^$semesterNumber/{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | cut -c 3- > "$cacheDir"/semesters
+  tac "$cacheDir/semesters" | sed '/\S/,$!d' | tac > "$cacheDir"/semestersready
+  sed '/\S/,$!d' "$cacheDir"/semestersready > "$cacheDir"/semestersfinal
+  # awk "/^$semesterNumber/{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | sed "/^$semesterNumber $/d" | cut -c 3- > "$cacheDir"/semesters
 
   awk "/^1 /{print}" "$cacheDir"/formatted | tail -n +9 | head -n -6 | sed "/^1 $/d" | cut -c 3- > "$cacheDir"/dates
 
-  paste --delimiter=' ' "$cacheDir"/dates "$cacheDir"/subjects "$cacheDir"/semesters > "$cacheDir"/sorted
+  paste --delimiter=' ' "$cacheDir"/dates "$cacheDir"/subjectsfinal "$cacheDir"/semestersfinal > "$cacheDir"/sorted
+
 
   sorted="$cacheDir"/sorted
 
